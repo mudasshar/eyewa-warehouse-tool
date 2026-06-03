@@ -1,1 +1,98 @@
-{}
+{
+  "ACC": {
+    "major": "Accessories",
+    "sub": "Accessories"
+  },
+  "BFA": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "BFN": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "BL": {
+    "major": "SG/EG Frames",
+    "sub": "Blue Light"
+  },
+  "CCL": {
+    "major": "Contact Lenses",
+    "sub": "Contact Lenses"
+  },
+  "CWP": {
+    "major": "Contact Lenses",
+    "sub": "Contact Lenses"
+  },
+  "DLN": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "EG": {
+    "major": "SG/EG Frames",
+    "sub": "Frames"
+  },
+  "EYE": {
+    "major": "Other",
+    "sub": "Other"
+  },
+  "FOC": {
+    "major": "FOC",
+    "sub": "FOC"
+  },
+  "HLC": {
+    "major": "Health Care",
+    "sub": "Health Care"
+  },
+  "NSL": {
+    "major": "Demo Frame",
+    "sub": "Demo Frame"
+  },
+  "OLA": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "OLN": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "PCL": {
+    "major": "Contact Lenses",
+    "sub": "Contact Lenses"
+  },
+  "PGA": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "PGN": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  },
+  "PMF": {
+    "major": "Contact Lenses",
+    "sub": "Contact Lenses"
+  },
+  "PWA": {
+    "major": "Contact Lenses",
+    "sub": "Contact Lenses"
+  },
+  "RG": {
+    "major": "Reading Glass",
+    "sub": "Reading Glass"
+  },
+  "SG": {
+    "major": "SG/EG Frames",
+    "sub": "Sunglass"
+  },
+  "SG3": {
+    "major": "SG/EG Frames",
+    "sub": "SG/EG Frames"
+  },
+  "SOL": {
+    "major": "Solutions",
+    "sub": "Solutions"
+  },
+  "SV": {
+    "major": "EG Lenses",
+    "sub": "EG Lenses"
+  }
+}
