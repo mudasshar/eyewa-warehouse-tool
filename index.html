@@ -877,13 +877,13 @@ var DEFAULT_CAT2 = {
   PGA:{major:'EG Lenses',sub:'EG Lenses'},PGN:{major:'EG Lenses',sub:'EG Lenses'},
   PMF:{major:'Contact Lenses',sub:'Contact Lenses'},PWA:{major:'Contact Lenses',sub:'Contact Lenses'},
   RG:{major:'Reading Glass',sub:'Reading Glass'},
-  SG:{major:'SG/EG Frames',sub:'Sunglass'},SG3:{major:'SG/EG Frames',sub:'3rd Party Sunglass'},
+  SG:{major:'SG/EG Frames',sub:'Sunglass'},SG3:{major:'SG/EG Frames',sub:'SG/EG Frames'},
   SOL:{major:'Solutions',sub:'Solutions'},SV:{major:'EG Lenses',sub:'EG Lenses'}
 };
 // Legacy flat map kept for backwards compat
 var DEFAULT_CAT = (function(){var m={};Object.keys(DEFAULT_CAT2).forEach(function(k){m[k]=DEFAULT_CAT2[k].sub;});return m;})();
 var DEFAULT_CLKW = ['contact lenses','contact lens','contactlenses','contactlens','ccl','cwp','pcl','pmf','pwa'];
-var DEFAULT_BL   = ['11111111','00000000','99999999','12345678','11111112'];
+var DEFAULT_BL   = ['11111111'];
 
 // ── BUILT-IN LOCATION MAP (all warehouses, auto-loaded) ─
 var outputData=[],filteredData=[],emptyData=[];
