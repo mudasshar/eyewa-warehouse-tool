@@ -835,7 +835,7 @@ body.light .whi{background:rgba(0,0,0,0.03)}
 
 <script>
 // ── CONSTANTS ──────────────────────────────────────────
-var ADMIN_PW    = 'Eyewa@2026';
+var ADMIN_PW    = 'eyewa123';
 var LS_CAT      = 'wh_cat_map';
 var LS_CAT2     = 'wh_cat_map_v2';
 var LS_ALIAS    = 'wh_col_alias';
@@ -1551,14 +1551,24 @@ function processEmptyBins(){
 function _doEmptyProcess(data,code,btn){
   var CHUNK=5000,i=0,total=data.length;
   var present=new Set();
+  var fileWHCodes=new Set();
+  var alias=getAlias();
+  var whColKey=(alias.warehouse||'warehouse').toLowerCase();
   parseProgressShow();
   parseProgressSet(0,'Scanning locations… 0 / '+total.toLocaleString()+' rows');
 
   function pass1(){
     var end=Math.min(i+CHUNK,total);
     for(;i<end;i++){
-      var l=(data[i]['location']||'').toString().replace(/\s+/g,'').toUpperCase();
-      if(l)present.add(l);
+      var row=data[i];
+      // Resolve warehouse column using alias or fallback
+      var rowWH=String(colVal(row,'warehouse')||row[whColKey]||'').trim().toUpperCase();
+      if(rowWH)fileWHCodes.add(rowWH);
+      // Only mark location as present if it belongs to the SELECTED warehouse
+      if(rowWH===code){
+        var l=(row['location']||colVal(row,'location')||'').toString().replace(/\s+/g,'').toUpperCase();
+        if(l)present.add(l);
+      }
     }
     parseProgressSet(Math.round((i/total)*80),'Scanning locations… '+i.toLocaleString()+' / '+total.toLocaleString()+' rows');
     if(i<total){setTimeout(pass1,0);}else{setTimeout(finish,0);}
@@ -1567,6 +1577,12 @@ function _doEmptyProcess(data,code,btn){
   function finish(){
     parseProgressSet(90,'Finding empty bins…');
     setTimeout(function(){
+      // Validate: selected warehouse must exist in the uploaded file
+      if(fileWHCodes.size>0&&!fileWHCodes.has(code)){
+        var found=Array.from(fileWHCodes).sort().join(', ');
+        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br>Warehouses found in file: <strong>'+found+'</strong><br>Please select the correct warehouse or upload the matching file.');
+        btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
+      }
       var locMap=getWHLocSet(code);
       if(!locMap||!Object.keys(locMap).length){showAlert('emptyAlert','No matching locations found for selected zone range.');btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;}
       emptyData=[];
