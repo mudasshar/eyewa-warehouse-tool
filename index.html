@@ -746,6 +746,16 @@ body.light .whi{background:rgba(0,0,0,0.03)}
       <div id="tabGH" style="display:none">
         <div class="asec">🐙 GitHub Sync</div>
         <div class="ahint">Connect to a GitHub repository so all config changes (categories, aliases, location maps, defaults) sync to <strong>every user</strong> automatically. One admin saves → everyone gets the update on next load.</div>
+
+        <!-- Hardcoded repo note -->
+        <div id="ghHardcodedNote" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--good);font-family:var(--mono)">
+          ✅ Public repo is hardcoded in the HTML — all users auto-pull config on open without needing to configure anything.
+        </div>
+
+        <!-- One-time setup notice -->
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--warn)">
+          ⚠ <strong>One-time admin setup:</strong> After saving credentials below, open the HTML file and fill in <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px">GH_PUBLIC_USER</code> and <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px">GH_PUBLIC_REPO</code> near the top of the script — this makes all users auto-sync without any setup on their end. Then re-upload to GitHub.
+        </div>
         <div id="ghAlert" style="margin-top:10px"></div>
 
         <!-- Connection Status -->
@@ -835,7 +845,7 @@ body.light .whi{background:rgba(0,0,0,0.03)}
 
 <script>
 // ── CONSTANTS ──────────────────────────────────────────
-var ADMIN_PW    = 'Eyewa@2026';
+var ADMIN_PW    = 'eyewa123';
 var LS_CAT      = 'wh_cat_map';
 var LS_CAT2     = 'wh_cat_map_v2';
 var LS_ALIAS    = 'wh_col_alias';
@@ -844,8 +854,6 @@ var LS_WH       = 'wh_locations_v2';
 var LS_CLKW     = 'wh_cl_keywords';
 var LS_BL       = 'wh_batch_blacklist';
 var LS_HKMO     = 'wh_hk_months';
-var GH_PUBLIC_USER  = 'your-github-username';
-var GH_PUBLIC_REPO  = 'eyewa-warehouse-tool';
 
 var WHS = [
   {code:'WUDDXB',name:'Dubai'  },{code:'WSWJED',name:'Jeddah' },
@@ -1582,14 +1590,7 @@ function _doEmptyProcess(data,code,btn){
       // Validate: selected warehouse must exist in the uploaded file
       if(fileWHCodes.size>0&&!fileWHCodes.has(code)){
         var found=Array.from(fileWHCodes).sort().join(', ');
-showAlert(
-    'emptyAlert',
-    '<div style="line-height:1.6;">' +
-    '⚠️The selected warehouse (<strong>' + code + '</strong>) was not found in the uploaded file.<br>' +
-    'Warehouses found in file:<strong>' + found + '</strong><br>' +
-    'Please select the correct warehouse or upload the matching file.' +
-    '</div>'
-);
+        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br>Warehouses found in file: <strong>'+found+'</strong><br>Please select the correct warehouse or upload the matching file.');
         btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
       }
       var locMap=getWHLocSet(code);
@@ -2009,7 +2010,33 @@ var GH_FILES={
   blacklist:'config/blacklist.json'
 };
 
+// ── HARDCODED PUBLIC REPO (for all users to auto-pull config) ──
+// Admin: fill in your GitHub username and repo name here.
+// Users do NOT need to configure anything — they pull automatically.
+// The token is only needed for PUSHING (admin only, entered in the UI).
+var GH_PUBLIC_USER  = 'mudasshar';
+var GH_PUBLIC_REPO  = 'eyewa-warehouse-tool';
+var GH_PUBLIC_BRANCH= 'main';
+
 function getGHConfig(){try{var s=localStorage.getItem(LS_GH);return s?JSON.parse(s):{};}catch(e){return{};}}
+function saveGHConfig(cfg){localStorage.setItem(LS_GH,JSON.stringify(cfg));}
+
+function ghGetCreds(){
+  var cfg=getGHConfig();
+  // Use localStorage creds if set (admin), else fall back to hardcoded public values
+  return {
+    user:  cfg.user  || GH_PUBLIC_USER,
+    repo:  cfg.repo  || GH_PUBLIC_REPO,
+    branch:cfg.branch|| GH_PUBLIC_BRANCH,
+    token: cfg.token || ''
+  };
+}
+
+function ghAPIBase(){
+  var c=ghGetCreds();
+  return 'https://api.github.com/repos/'+c.user+'/'+c.repo+'/contents/';
+}
+
 function saveGHConfig(cfg){localStorage.setItem(LS_GH,JSON.stringify(cfg));}
 
 function ghGetCreds(){
@@ -2039,12 +2066,14 @@ function loadGHTab(){
   document.getElementById('ghUser').value=c.user||'';
   document.getElementById('ghRepo').value=c.repo||'';
   document.getElementById('ghBranch').value=c.branch||'main';
-  document.getElementById('ghToken').value=c.token||'';
-  var auto=localStorage.getItem(LS_GH_AUTO)==='1';
-  ghSetAutoToggle(auto);
+  document.getElementById('ghToken').value=getGHConfig().token||'';
+  // Show note if hardcoded values are set
+  var usingHardcoded=!getGHConfig().user&&GH_PUBLIC_USER;
+  var note=document.getElementById('ghHardcodedNote');
+  if(note)note.style.display=usingHardcoded?'block':'none';
+  ghSetAutoToggle(true); // always on
   ghUpdateStatusBar();
   ghUpdateLastSync();
-  // Hide footer buttons — GitHub tab has its own action buttons
   document.getElementById('adminResetBtn').style.display='none';
   document.getElementById('adminSaveBtn').style.display='none';
   document.getElementById('adminFooterNote').textContent='🐙 GitHub Sync — changes apply to all users';
@@ -2277,33 +2306,35 @@ function ghSetAutoToggle(on){
 
 // Auto-pull on page load if enabled
 document.addEventListener('DOMContentLoaded',function(){
-  if(localStorage.getItem(LS_GH_AUTO)==='1'){
-    var c=ghGetCreds();
-    if(c.user&&c.repo){
-      // Silent pull — no UI feedback on load
-      var files=Object.keys(GH_FILES);
-      var pulled={};var i=0;
-      function silentPull(){
-        if(i>=files.length){
-          try{
-            if(pulled.categories&&Object.keys(pulled.categories).length)localStorage.setItem(LS_CAT2,JSON.stringify(pulled.categories));
-            if(pulled.aliases)localStorage.setItem(LS_ALIAS,JSON.stringify(pulled.aliases));
-            if(pulled.defaults){localStorage.setItem(LS_DEFAULTS,JSON.stringify(pulled.defaults));applyReplenDefaults();}
-            if(pulled.locations){whLocs=pulled.locations;localStorage.setItem(LS_WH,JSON.stringify(whLocs));mergeBuiltinLocs();}
-            if(pulled.keywords)localStorage.setItem(LS_CLKW,JSON.stringify(pulled.keywords));
-            if(pulled.blacklist)localStorage.setItem(LS_BL,JSON.stringify(pulled.blacklist));
-            localStorage.setItem('wh_gh_last_sync',Date.now().toString());
-          }catch(e){}
-          return;
-        }
-        var key=files[i];
-        fetch(ghRawBase()+GH_FILES[key]+'?cb='+Date.now())
-          .then(function(r){return r.ok?r.json():null;})
-          .then(function(d){if(d)pulled[key]=d;i++;silentPull();})
-          .catch(function(){i++;silentPull();});
+  // Always auto-pull from GitHub on load if credentials are configured
+  // No toggle needed — if the repo is set up, always stay in sync
+  var c=ghGetCreds();
+  if(c.user&&c.repo){
+    var files=Object.keys(GH_FILES);
+    var pulled={};var i=0;
+    function silentPull(){
+      if(i>=files.length){
+        try{
+          if(pulled.categories&&Object.keys(pulled.categories).length)localStorage.setItem(LS_CAT2,JSON.stringify(pulled.categories));
+          if(pulled.aliases)localStorage.setItem(LS_ALIAS,JSON.stringify(pulled.aliases));
+          if(pulled.defaults){localStorage.setItem(LS_DEFAULTS,JSON.stringify(pulled.defaults));applyReplenDefaults();}
+          if(pulled.locations){whLocs=pulled.locations;localStorage.setItem(LS_WH,JSON.stringify(whLocs));mergeBuiltinLocs();}
+          if(pulled.keywords)localStorage.setItem(LS_CLKW,JSON.stringify(pulled.keywords));
+          if(pulled.blacklist)localStorage.setItem(LS_BL,JSON.stringify(pulled.blacklist));
+          localStorage.setItem('wh_gh_last_sync',Date.now().toString());
+          // Show a subtle sync indicator in the header if element exists
+          var ind=document.getElementById('ghSyncIndicator');
+          if(ind){ind.textContent='✅ Synced with GitHub';ind.style.display='inline';}
+        }catch(e){}
+        return;
       }
-      silentPull();
+      var key=files[i];
+      fetch(ghRawBase()+GH_FILES[key]+'?cb='+Date.now())
+        .then(function(r){return r.ok?r.json():null;})
+        .then(function(d){if(d)pulled[key]=d;i++;silentPull();})
+        .catch(function(){i++;silentPull();});
     }
+    silentPull();
   }
 });
 </script>
