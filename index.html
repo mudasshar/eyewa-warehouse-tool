@@ -877,13 +877,13 @@ var DEFAULT_CAT2 = {
   PGA:{major:'EG Lenses',sub:'EG Lenses'},PGN:{major:'EG Lenses',sub:'EG Lenses'},
   PMF:{major:'Contact Lenses',sub:'Contact Lenses'},PWA:{major:'Contact Lenses',sub:'Contact Lenses'},
   RG:{major:'Reading Glass',sub:'Reading Glass'},
-  SG:{major:'SG/EG Frames',sub:'Sunglass'},SG3:{major:'SG/EG Frames',sub:'SG/EG Frames'},
+  SG:{major:'SG/EG Frames',sub:'Sunglass'},SG3:{major:'SG/EG Frames',sub:'3rd Party Sunglass'},
   SOL:{major:'Solutions',sub:'Solutions'},SV:{major:'EG Lenses',sub:'EG Lenses'}
 };
 // Legacy flat map kept for backwards compat
 var DEFAULT_CAT = (function(){var m={};Object.keys(DEFAULT_CAT2).forEach(function(k){m[k]=DEFAULT_CAT2[k].sub;});return m;})();
 var DEFAULT_CLKW = ['contact lenses','contact lens','contactlenses','contactlens','ccl','cwp','pcl','pmf','pwa'];
-var DEFAULT_BL   = ['11111111'];
+var DEFAULT_BL   = ['11111111','00000000','99999999','12345678','11111112'];
 
 // ── BUILT-IN LOCATION MAP (all warehouses, auto-loaded) ─
 var outputData=[],filteredData=[],emptyData=[];
@@ -2066,7 +2066,7 @@ var GH_FILES={
 // Admin: fill in your GitHub username and repo name here.
 // Users do NOT need to configure anything — they pull automatically.
 // The token is only needed for PUSHING (admin only, entered in the UI).
-var GH_PUBLIC_USER  = '';   // e.g. 'mudasshar'
+var GH_PUBLIC_USER  = '';   // e.g. 'eyewa-admin'
 var GH_PUBLIC_REPO  = '';   // e.g. 'eyewa-warehouse-tool'
 var GH_PUBLIC_BRANCH= 'main';
 
@@ -2235,6 +2235,11 @@ function ghPushAll(){
   showAlert('ghAlert','');
   ghSetSyncProgress(0,'Preparing config…');
 
+  // Auto-save current tab before pushing so latest unsaved edits are included
+  if(activeAdminTab==='tabCat')saveCatTab();
+  else if(activeAdminTab==='tabAlias')saveAliasTab();
+  else if(activeAdminTab==='tabDef')saveDefaultsTab();
+  else if(activeAdminTab==='tabHK')saveHKTab();
   var payload={
     categories:getCatMap(),
     aliases:getAlias(),
