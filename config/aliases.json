@@ -1,1 +1,11 @@
-{}
+{
+  "sku": "sku",
+  "itemId": "item id",
+  "locType": "location type",
+  "location": "location",
+  "availQty": "available qty",
+  "resQty": "reserved qty",
+  "total": "total",
+  "batch": "batch number",
+  "warehouse": "warehouse"
+}
