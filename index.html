@@ -922,7 +922,21 @@ var hkSortCol=null,hkSortDir=1;
 
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
-  // Show loading indicator while syncing
+  // ── GITHUB RAW BASE ─────────────────────────────────
+  // Fill in your GitHub username and repo name below.
+  // This is the ONLY place you need to change — baked into
+  // the HTML so ALL users auto-pull with zero configuration.
+  var GITHUB_USER = 'mudasshar';
+  var GITHUB_REPO = 'eyewa-warehouse-tool';
+  var GITHUB_BRANCH = 'main';
+  var GITHUB_RAW    = 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/';
+  // Store for use by pull/push functions
+  window._GH_RAW    = GITHUB_RAW;
+  window._GH_USER   = GITHUB_USER;
+  window._GH_REPO   = GITHUB_REPO;
+  window._GH_BRANCH = GITHUB_BRANCH;
+
+  // Loading bar
   var loadingBar=document.createElement('div');
   loadingBar.id='ghInitBar';
   loadingBar.style.cssText='position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#10b981);z-index:99999;animation:ghBarAnim 1.5s ease-in-out infinite';
@@ -939,46 +953,48 @@ document.addEventListener('DOMContentLoaded',function(){
     onWHChange();
     var m=getSavedHkMonths();
     setHkMonths(m);
-    // Remove loading bar
     var bar=document.getElementById('ghInitBar');
     if(bar)bar.remove();
   }
 
-  // Pull from GitHub first, then init the app
-  var c=ghGetCreds();
-  if(c.user&&c.repo){
+  // Only pull if username is filled in
+  var isConfigured = (GITHUB_USER!=='FILL_YOUR_USERNAME'&&GITHUB_USER!=='');
+
+  if(isConfigured){
     var files=Object.keys(GH_FILES);
-    var pulled={};var i=0;
+    var pulled={};var idx=0;
+
     function silentPull(){
-      if(i>=files.length){
-        // Apply pulled config to localStorage BEFORE initApp reads it
+      if(idx>=files.length){
+        // Write ALL pulled config to localStorage BEFORE initApp reads it
         try{
           if(pulled.categories&&Object.keys(pulled.categories).length)
             localStorage.setItem(LS_CAT2,JSON.stringify(pulled.categories));
-          if(pulled.aliases)
+          if(pulled.aliases&&Object.keys(pulled.aliases).length)
             localStorage.setItem(LS_ALIAS,JSON.stringify(pulled.aliases));
-          if(pulled.defaults)
+          if(pulled.defaults&&Object.keys(pulled.defaults).length)
             localStorage.setItem(LS_DEFAULTS,JSON.stringify(pulled.defaults));
-          if(pulled.locations)
+          if(pulled.locations&&Object.keys(pulled.locations).length)
             localStorage.setItem(LS_WH,JSON.stringify(pulled.locations));
-          if(pulled.keywords)
+          if(pulled.keywords&&pulled.keywords.length)
             localStorage.setItem(LS_CLKW,JSON.stringify(pulled.keywords));
-          if(pulled.blacklist)
+          if(pulled.blacklist&&pulled.blacklist.length)
             localStorage.setItem(LS_BL,JSON.stringify(pulled.blacklist));
           localStorage.setItem('wh_gh_last_sync',Date.now().toString());
-        }catch(e){}
+        }catch(e){console.warn('GH config apply error:',e);}
         initApp();
         return;
       }
-      var key=files[i];
-      fetch(ghRawBase()+GH_FILES[key]+'?cb='+Date.now())
+      var key=files[idx];
+      var url=GITHUB_RAW+GH_FILES[key]+'?cb='+Date.now();
+      fetch(url)
         .then(function(r){return r.ok?r.json():null;})
-        .then(function(d){if(d)pulled[key]=d;i++;silentPull();})
-        .catch(function(){i++;silentPull();});
+        .then(function(d){if(d)pulled[key]=d;idx++;silentPull();})
+        .catch(function(){idx++;silentPull();});
     }
     silentPull();
   } else {
-    // No GitHub configured — init immediately from localStorage
+    // Not configured — load from localStorage only
     initApp();
   }
 });
@@ -2066,8 +2082,8 @@ var GH_FILES={
 // Admin: fill in your GitHub username and repo name here.
 // Users do NOT need to configure anything — they pull automatically.
 // The token is only needed for PUSHING (admin only, entered in the UI).
-var GH_PUBLIC_USER  = 'mudasshar';   // e.g. 'eyewa-admin'
-var GH_PUBLIC_REPO  = 'eyewa-warehouse-tool';   // e.g. 'eyewa-warehouse-tool'
+var GH_PUBLIC_USER  = '';   // e.g. 'eyewa-admin'
+var GH_PUBLIC_REPO  = '';   // e.g. 'eyewa-warehouse-tool'
 var GH_PUBLIC_BRANCH= 'main';
 
 function getGHConfig(){try{var s=localStorage.getItem(LS_GH);return s?JSON.parse(s):{};}catch(e){return{};}}
@@ -2075,12 +2091,12 @@ function saveGHConfig(cfg){localStorage.setItem(LS_GH,JSON.stringify(cfg));}
 
 function ghGetCreds(){
   var cfg=getGHConfig();
-  // Use localStorage creds if set (admin), else fall back to hardcoded public values
+  // Use localStorage creds if set by admin, else use hardcoded window globals
   return {
-    user:  cfg.user  || GH_PUBLIC_USER,
-    repo:  cfg.repo  || GH_PUBLIC_REPO,
-    branch:cfg.branch|| GH_PUBLIC_BRANCH,
-    token: cfg.token || ''
+    user:  cfg.user   || window._GH_USER   || GH_PUBLIC_USER,
+    repo:  cfg.repo   || window._GH_REPO   || GH_PUBLIC_REPO,
+    branch:cfg.branch || window._GH_BRANCH || GH_PUBLIC_BRANCH,
+    token: cfg.token  || ''
   };
 }
 
@@ -2102,8 +2118,12 @@ function ghAPIBase(){
 }
 
 function ghRawBase(){
-  var c=ghGetCreds();
-  return 'https://raw.githubusercontent.com/'+c.user+'/'+c.repo+'/'+c.branch+'/';
+  // Use window globals set at DOMContentLoaded (hardcoded in HTML)
+  // Fall back to localStorage creds if globals not set
+  var user=window._GH_USER||ghGetCreds().user;
+  var repo=window._GH_REPO||ghGetCreds().repo;
+  var branch=window._GH_BRANCH||ghGetCreds().branch||'main';
+  return 'https://raw.githubusercontent.com/'+user+'/'+repo+'/'+branch+'/';
 }
 
 function ghHeaders(){
@@ -2114,16 +2134,18 @@ function ghHeaders(){
 }
 
 function loadGHTab(){
+  var cfg=getGHConfig();
   var c=ghGetCreds();
+  // Show hardcoded values (read-only hint) + allow token entry
   document.getElementById('ghUser').value=c.user||'';
   document.getElementById('ghRepo').value=c.repo||'';
   document.getElementById('ghBranch').value=c.branch||'main';
-  document.getElementById('ghToken').value=getGHConfig().token||'';
-  // Show note if hardcoded values are set
-  var usingHardcoded=!getGHConfig().user&&GH_PUBLIC_USER;
+  document.getElementById('ghToken').value=cfg.token||'';
+  // Show note if using hardcoded values
+  var usingHardcoded=(window._GH_USER&&window._GH_USER!=='FILL_YOUR_USERNAME');
   var note=document.getElementById('ghHardcodedNote');
   if(note)note.style.display=usingHardcoded?'block':'none';
-  ghSetAutoToggle(true); // always on
+  ghSetAutoToggle(true);
   ghUpdateStatusBar();
   ghUpdateLastSync();
   document.getElementById('adminResetBtn').style.display='none';
@@ -2184,7 +2206,8 @@ function ghUpdateStatusBar(){
   bar.style.background='rgba(88,166,255,0.08)';
   bar.style.border='1px solid rgba(88,166,255,0.2)';
   bar.style.color='#58a6ff';
-  bar.innerHTML='🐙 Connected to: <strong style="margin:0 4px">'+c.user+'/'+c.repo+'</strong> (branch: '+c.branch+')';
+  var src=(window._GH_USER&&window._GH_USER!=='FILL_YOUR_USERNAME')?' <span style="font-size:10px;opacity:0.7">(hardcoded in HTML)</span>':'';
+  bar.innerHTML='🐙 Connected to: <strong style="margin:0 4px">'+c.user+'/'+c.repo+'</strong> · branch: '+c.branch+src;
 }
 
 function ghUpdateLastSync(){
