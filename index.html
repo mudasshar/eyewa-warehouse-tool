@@ -1660,8 +1660,8 @@ function _doEmptyProcess(data,code,btn){
         var found=Array.from(fileWHCodes).sort().join(', ');
         showAlert(
     'emptyAlert',
-    '⚠️ The selected warehouse (<strong>' + code + '</strong>) was not found in the uploaded file.<br><br>' +
-    'Warehouses found in file:<br><strong>' + found + '</strong><br><br>' +
+    '⚠️ The selected warehouse (<strong>' + code + '</strong>) was not found in the uploaded file.<br>' +
+    'Warehouses found in file:<strong>' + found + '</strong>' +
     'Please select the correct warehouse or upload the matching file.'
 );
         btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
