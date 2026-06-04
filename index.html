@@ -1661,10 +1661,9 @@ function _doEmptyProcess(data,code,btn){
 showAlert(
     'emptyAlert',
     '<div style="text-align:left; line-height:1.5;">' +
-    'The selected warehouse <strong>' + code + '</strong> was not found in the uploaded file.<br><br>' +
-    '<strong>Warehouses found in file:</strong><br>' +
-    found +
-    '<br><br>Please select the correct warehouse or upload the matching file.' +
+    'The selected warehouse <strong>' + code + '</strong> was not found in the uploaded file.<br>' +
+    '<strong>Warehouses found in file:</strong><br>' + found +
+    '<br>Please select the correct warehouse or upload the matching file.' +
     '</div>'
 );
         btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
