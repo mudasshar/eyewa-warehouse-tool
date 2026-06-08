@@ -421,7 +421,7 @@ body.light .whi{background:rgba(0,0,0,0.03)}
       <div class="srl" id="replenSRL"></div>
       <div class="sumc" id="summaryCard">
         <div class="sumch" onclick="toggleSummaryCard()">
-          <div class="sumct">📊 Replenishment Summary</div>
+          <div class="sumct" id="sumcTitle">📊 Replenishment Summary — All Warehouses</div>
           <span class="sumcv op" id="sumcToggle">▲</span>
         </div>
         <div id="sumcBody">
@@ -430,6 +430,7 @@ body.light .whi{background:rgba(0,0,0,0.03)}
             <div class="sti"><div class="stn cz" id="sumZero">0</div><div class="stl">Zero Stock</div></div>
             <div class="sti"><div class="stn cl" id="sumLow">0</div><div class="stl">Low Stock</div></div>
           </div>
+          <div id="sumWhBreak" style="display:none;margin-bottom:10px;padding:8px 0"></div>
           <div id="sumCats"></div>
         </div>
       </div>
@@ -926,8 +927,8 @@ document.addEventListener('DOMContentLoaded',function(){
   // Fill in your GitHub username and repo name below.
   // This is the ONLY place you need to change — baked into
   // the HTML so ALL users auto-pull with zero configuration.
-  var GITHUB_USER = 'mudasshar';
-  var GITHUB_REPO = 'eyewa-warehouse-tool';
+  var GITHUB_USER   = 'FILL_YOUR_USERNAME';
+  var GITHUB_REPO   = 'FILL_YOUR_REPO';
   var GITHUB_BRANCH = 'main';
   var GITHUB_RAW    = 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/';
   // Store for use by pull/push functions
@@ -1352,6 +1353,8 @@ function _doReplenProcess(data,btn){
   var thr=parseInt(document.getElementById('thresholdInput').value)||5;
   var CHUNK=5000,i=0,total=data.length;
   var pickQty={},pickRows={},whSet=new Set();
+  // selectedWH is the warehouse filter chosen by the user
+  var selectedWH=document.getElementById('replenWHFilter')?document.getElementById('replenWHFilter').value:'all';
 
   parseProgressShow();
   parseProgressSet(0,'Building pick index… 0 / '+total.toLocaleString()+' rows');
@@ -1360,6 +1363,11 @@ function _doReplenProcess(data,btn){
     var end=Math.min(i+CHUNK,total);
     for(;i<end;i++){
       var r=data[i];
+      var rowWH=String(colVal(r,'warehouse')||r['warehouse']||'').trim().toUpperCase();
+      if(rowWH)whSet.add(rowWH);
+      // Only include rows matching the selected warehouse (skip if 'all' and multi-WH file)
+      var whMatch=(selectedWH==='all'||!selectedWH||rowWH===selectedWH||rowWH==='');
+      if(!whMatch)continue;
       if(String(colVal(r,'locType')||'').toLowerCase().includes('pick')){
         var s=String(colVal(r,'sku')||'').toLowerCase();
         var qty=Number(colVal(r,'availQty'))||0;
@@ -1367,14 +1375,12 @@ function _doReplenProcess(data,btn){
         if(!pickRows[s])pickRows[s]=[];
         pickRows[s].push({
           id:colVal(r,'itemId')||'',sku:s,cat:getCategory(colVal(r,'itemId')),
-          wh:String(colVal(r,'warehouse')||r['warehouse']||'').trim().toUpperCase(),
+          wh:rowWH,
           batch:colVal(r,'batch')||'',loc:String(colVal(r,'location')||'').toUpperCase(),
           type:String(colVal(r,'locType')||'').toUpperCase(),
           available_qty:qty,reserved_qty:Number(colVal(r,'resQty'))||0,total_qty:Number(colVal(r,'total'))||0
         });
       }
-      var w=String(colVal(r,'warehouse')||r['warehouse']||'').trim().toUpperCase();
-      if(w)whSet.add(w);
     }
     var pct=Math.round((i/total)*45);
     parseProgressSet(pct,'Building pick index… '+i.toLocaleString()+' / '+total.toLocaleString()+' rows');
@@ -1387,12 +1393,15 @@ function _doReplenProcess(data,btn){
     var end=Math.min(i+CHUNK,total);
     for(;i<end;i++){
       var r=data[i];
+      var rowWH=String(colVal(r,'warehouse')||r['warehouse']||'').trim().toUpperCase();
+      var whMatch=(selectedWH==='all'||!selectedWH||rowWH===selectedWH||rowWH==='');
+      if(!whMatch)continue;
       var sku=String(colVal(r,'sku')||'').toLowerCase();
       if(String(colVal(r,'locType')||'').toLowerCase().includes('bulk')&&needsReplen(sku)){
         var pQty=pickQty[sku]!==undefined?pickQty[sku]:0,status=pQty<=0?'zero':'low';
         outputData.push({
           id:colVal(r,'itemId')||'',sku:sku,cat:getCategory(colVal(r,'itemId')),
-          wh:String(colVal(r,'warehouse')||r['warehouse']||'').trim().toUpperCase(),
+          wh:rowWH,
           batch:colVal(r,'batch')||'',
           loc:String(colVal(r,'location')||'').toUpperCase(),type:String(colVal(r,'locType')||'').toUpperCase(),
           pick_qty:pQty,available_qty:Number(colVal(r,'availQty'))||0,
@@ -1536,6 +1545,10 @@ function applyFilters(searchTerm){
   if(q||activeCatFilter!=='all'||whF!=='all'){lbl.style.display='block';lbl.textContent='Showing '+filteredData.length+' of '+outputData.length+' SKUs'+(activeCatFilter!=='all'?' · '+activeCatFilter:'')+(whF!=='all'?' · '+whF:'')+(q?' · "'+searchTerm+'"':'');}
   else{lbl.style.display='none';}
   renderReplen(searchTerm);document.getElementById('replenDownBtn').disabled=filteredData.length===0;
+  // Update summary card to reflect current filter
+  if(filteredData.length){renderSummaryCard(filteredData);}
+  // Update count badge
+  document.getElementById('replenCount').textContent=filteredData.length;
 }
 function renderSummaryCard(data){
   document.getElementById('sumTotal').textContent=data.length;
@@ -1544,6 +1557,34 @@ function renderSummaryCard(data){
   var cm={};data.forEach(function(r){if(!cm[r.cat])cm[r.cat]=new Set();cm[r.cat].add(r.sku);});
   var cats=Object.entries(cm).sort(function(a,b){return b[1].size-a[1].size;}),mx=cats.length?cats[0][1].size:1;
   document.getElementById('sumCats').innerHTML=cats.map(function(e){return '<div class="cbrow"><span class="cbn">'+e[0]+'</span><div class="cbw"><div class="cbb" style="width:'+Math.round(e[1].size/mx*100)+'%"></div></div><span class="cbc">'+e[1].size+'</span></div>';}).join('');
+  // Update summary title to show which warehouse is being summarised
+  var whF=document.getElementById('replenWHFilter')?document.getElementById('replenWHFilter').value:'all';
+  var titleEl=document.getElementById('sumcTitle');
+  if(titleEl){
+    var whs=whF==='all'?'All Warehouses':whF;
+    titleEl.textContent='📊 Replenishment Summary — '+whs;
+  }
+  // Per-warehouse breakdown when All is selected
+  var whBreakEl=document.getElementById('sumWhBreak');
+  if(whBreakEl){
+    if(whF==='all'){
+      var wm={};data.forEach(function(r){if(!wm[r.wh])wm[r.wh]={total:0,zero:0,low:0};wm[r.wh].total++;if(r.status==='zero')wm[r.wh].zero++;else wm[r.wh].low++;});
+      whBreakEl.style.display='block';
+      whBreakEl.innerHTML='<div style="font-size:10px;font-family:var(--mono);color:var(--muted2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px">By Warehouse</div>'+
+        Object.keys(wm).sort().map(function(wh){
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--mono)">'+
+            '<span style="color:var(--text);font-weight:600">'+wh+'</span>'+
+            '<span style="display:flex;gap:8px">'+
+            '<span style="color:var(--danger)">●&nbsp;'+wm[wh].zero+' empty</span>'+
+            '<span style="color:var(--warn)">●&nbsp;'+wm[wh].low+' low</span>'+
+            '<span style="color:var(--muted2)">'+wm[wh].total+' total</span>'+
+            '</span></div>';
+        }).join('');
+    } else {
+      whBreakEl.style.display='none';
+      whBreakEl.innerHTML='';
+    }
+  }
   document.getElementById('summaryCard').classList.add('on');
 }
 function toggleSummaryCard(){var b=document.getElementById('sumcBody'),t=document.getElementById('sumcToggle'),open=b.style.display!=='none';b.style.display=open?'none':'block';t.classList.toggle('op',!open);}
@@ -1568,7 +1609,21 @@ function toggleUnknown(){document.getElementById('unknownBodyEl').classList.togg
 function downloadCSV(){
   var src=filteredData.length?filteredData:outputData;if(!src.length)return;
   var pickMap={};
-  src.forEach(function(r){if(r.pickRows&&r.pickRows.length&&!pickMap[r.sku]){var seen={};pickMap[r.sku]=r.pickRows.filter(function(pr){if(seen[pr.loc])return false;seen[pr.loc]=true;return true;});}});
+  src.forEach(function(r){
+    if(r.pickRows&&r.pickRows.length&&!pickMap[r.sku]){
+      var seen={};
+      // Only include pick rows that belong to the same warehouse as the bulk row
+      pickMap[r.sku]=r.pickRows.filter(function(pr){
+        if(seen[pr.loc])return false;
+        // Warehouse match: pick row WH must match bulk row WH
+        var prWH=pr.wh||'';
+        var rWH=r.wh||'';
+        if(prWH&&rWH&&prWH!==rWH)return false;
+        seen[pr.loc]=true;
+        return true;
+      });
+    }
+  });
 
   // ── SHEET 1: REPLENISHMENT (BULK) ─────────────────────
   var s1Headers=['WAREHOUSE','ITEM ID','SKU','CATEGORY','BATCH NUMBER','BULK LOCATION','LOC TYPE','PICK QTY TOTAL','STATUS','AVAILABLE QTY','RESERVED QTY','TOTAL QTY'];
@@ -1603,16 +1658,16 @@ function downloadCSV(){
     XLSX.utils.book_append_sheet(wb,ws1,'Replenishment');
     XLSX.utils.book_append_sheet(wb,ws2,'Existing Pick Locations');
     var whF=document.getElementById('replenWHFilter').value;
-    var whCode=whF!=='all'?whF:(src.length&&src[0].wh?src[0].wh:'');
-    var fname='Replenishment'+(whCode?'_'+whCode:'')+'.xlsx';
+    var whCode=whF!=='all'?whF:'ALL';
+    var fname='Replenishment_'+whCode+'.xlsx';
     XLSX.writeFile(wb,fname);
   } catch(e){
     // Fallback to CSV if XLSX fails
     var out='WAREHOUSE,ITEM ID,SKU,CATEGORY,BATCH NUMBER,BULK LOCATION,LOC TYPE,PICK QTY TOTAL,STATUS,AVAILABLE QTY,RESERVED QTY,TOTAL QTY\n';
     src.forEach(function(r){out+=[qv(r.wh||''),qv(r.id),qv(r.sku),qv(r.cat),qv(r.batch),qv(r.loc),qv(r.type),qn(r.pick_qty),qv(r.status.toUpperCase()),qn(r.available_qty),qn(r.reserved_qty),qn(r.total_qty)].join(',')+'\n';});
     var whF2=document.getElementById('replenWHFilter').value;
-    var whCode2=whF2!=='all'?whF2:(src.length&&src[0].wh?src[0].wh:'');
-    dl(out,'Replenishment'+(whCode2?'_'+whCode2:'')+'.csv');
+    var whCode2=whF2!=='all'?whF2:'ALL';
+    dl(out,'Replenishment_'+whCode2+'.csv');
   }
 }
 function downloadBulkTemplate(){dl('sku,qty,batch_number,from_location,to_location\n','bulk_template.csv');}
@@ -1658,14 +1713,7 @@ function _doEmptyProcess(data,code,btn){
       // Validate: selected warehouse must exist in the uploaded file
       if(fileWHCodes.size>0&&!fileWHCodes.has(code)){
         var found=Array.from(fileWHCodes).sort().join(', ');
-showAlert(
-    'emptyAlert',
-    '<div style="text-align:left; line-height:1.5;">' +
-    'The selected warehouse <strong>' + code + '</strong> was not found in the uploaded file.<br>' +
-    '<strong> Warehouses found in file: </strong> ' + found + 
-    '<br>Please select the correct warehouse or upload the matching file.' +
-    '</div>'
-);
+        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br>Warehouses found in file: <strong>'+found+'</strong><br>Please select the correct warehouse or upload the matching file.');
         btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
       }
       var locMap=getWHLocSet(code);
