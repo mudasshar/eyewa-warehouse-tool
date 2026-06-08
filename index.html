@@ -1713,7 +1713,7 @@ function _doEmptyProcess(data,code,btn){
       // Validate: selected warehouse must exist in the uploaded file
       if(fileWHCodes.size>0&&!fileWHCodes.has(code)){
         var found=Array.from(fileWHCodes).sort().join(', ');
-        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br>Warehouses found in file: <strong>'+found+'</strong><br>Please select the correct warehouse or upload the matching file.');
+        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br><strong>Warehouses found in file:</strong> '+found+' <br>Please select the correct warehouse or upload the matching file.');
         btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
       }
       var locMap=getWHLocSet(code);
