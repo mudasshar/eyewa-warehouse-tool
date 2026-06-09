@@ -13,7 +13,7 @@
   },
   "BL": {
     "major": "SG/EG Frames",
-    "sub": "Blue Light"
+    "sub": "SG/EG Frames"
   },
   "CCL": {
     "major": "Contact Lenses",
@@ -29,7 +29,7 @@
   },
   "EG": {
     "major": "SG/EG Frames",
-    "sub": "Frames"
+    "sub": "SG/EG Frames"
   },
   "EYE": {
     "major": "Other",
@@ -81,11 +81,11 @@
   },
   "SG": {
     "major": "SG/EG Frames",
-    "sub": "Sunglass"
+    "sub": "SG/EG Frames"
   },
   "SG3": {
     "major": "SG/EG Frames",
-    "sub": "3rd party Sunglasses"
+    "sub": "SG/EG Frames"
   },
   "SOL": {
     "major": "Solutions",
