@@ -10,7 +10,7 @@
 <style>
 :root{
   --bg1:#060d1a;--card:rgba(255,255,255,0.04);
-  --border:rgba(255,255,255,0.08);--text:#ffffff;--muted:#64748b;--muted2:#94a3b8;
+  --border:rgba(255,255,255,0.08);--text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
   --primary:#3b82f6;--primary-glow:rgba(59,130,246,0.15);
   --good:#10b981;--good-glow:rgba(16,185,129,0.15);
   --warn:#f59e0b;--danger:#ef4444;--purple:#a855f7;
@@ -924,13 +924,37 @@ var hkSortCol=null,hkSortDir=1;
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
   // ── GITHUB RAW BASE ─────────────────────────────────
-  // Fill in your GitHub username and repo name below.
-  // This is the ONLY place you need to change — baked into
-  // the HTML so ALL users auto-pull with zero configuration.
-  var GITHUB_USER   = 'mudasshar';
-  var GITHUB_REPO   = 'eyewa-warehouse-tool';
+  // Auto-detect from GitHub Pages URL — no manual config needed.
+  // Works automatically when hosted at:
+  //   https://USERNAME.github.io/REPO-NAME/
+  var GITHUB_USER   = '';
+  var GITHUB_REPO   = '';
   var GITHUB_BRANCH = 'main';
-  var GITHUB_RAW    = 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/';
+
+  // Auto-detect from window.location if hosted on GitHub Pages
+  try{
+    var _loc=window.location.hostname; // e.g. "username.github.io"
+    var _path=window.location.pathname; // e.g. "/repo-name/"
+    if(_loc.endsWith('.github.io')){
+      GITHUB_USER=_loc.replace('.github.io','');
+      // Repo name is the first path segment
+      var _seg=_path.split('/').filter(function(s){return s.length>0;});
+      if(_seg.length>0)GITHUB_REPO=_seg[0];
+    }
+  }catch(e){}
+
+  // Manual override — only needed if NOT on GitHub Pages
+  // (e.g. testing locally or hosted elsewhere)
+  // Leave blank to use auto-detection above.
+  var GITHUB_USER_OVERRIDE = '';
+  var GITHUB_REPO_OVERRIDE = '';
+  if(GITHUB_USER_OVERRIDE)GITHUB_USER=GITHUB_USER_OVERRIDE;
+  if(GITHUB_REPO_OVERRIDE)GITHUB_REPO=GITHUB_REPO_OVERRIDE;
+
+  var GITHUB_RAW = GITHUB_USER&&GITHUB_REPO
+    ? 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/'
+    : '';
+
   // Store for use by pull/push functions
   window._GH_RAW    = GITHUB_RAW;
   window._GH_USER   = GITHUB_USER;
@@ -959,7 +983,7 @@ document.addEventListener('DOMContentLoaded',function(){
   }
 
   // Only pull if username is filled in
-  var isConfigured = (GITHUB_USER!=='FILL_YOUR_USERNAME'&&GITHUB_USER!=='');
+  var isConfigured = (GITHUB_USER!==''&&GITHUB_REPO!=='');
 
   if(isConfigured){
     var files=Object.keys(GH_FILES);
@@ -1607,7 +1631,10 @@ function toggleUnknown(){document.getElementById('unknownBodyEl').classList.togg
 
 // ── EXPORT CSV ─────────────────────────────────────────
 function downloadCSV(){
-  var src=filteredData.length?filteredData:outputData;if(!src.length)return;
+  // Always export exactly what is currently visible — filteredData
+  // respects warehouse filter, category filter AND search term.
+  // Never fall back to outputData so filtered exports stay filtered.
+  var src=filteredData.slice();if(!src.length)return;
   var pickMap={};
   src.forEach(function(r){
     if(r.pickRows&&r.pickRows.length&&!pickMap[r.sku]){
@@ -1659,7 +1686,8 @@ function downloadCSV(){
     XLSX.utils.book_append_sheet(wb,ws2,'Existing Pick Locations');
     var whF=document.getElementById('replenWHFilter').value;
     var whCode=whF!=='all'?whF:'ALL';
-    var fname='Replenishment_'+whCode+'.xlsx';
+    var catPart=activeCatFilter&&activeCatFilter!=='all'?'_'+activeCatFilter.replace(/[^a-zA-Z0-9]/g,''):'';
+    var fname='Replenishment_'+whCode+catPart+'.xlsx';
     XLSX.writeFile(wb,fname);
   } catch(e){
     // Fallback to CSV if XLSX fails
@@ -1667,7 +1695,8 @@ function downloadCSV(){
     src.forEach(function(r){out+=[qv(r.wh||''),qv(r.id),qv(r.sku),qv(r.cat),qv(r.batch),qv(r.loc),qv(r.type),qn(r.pick_qty),qv(r.status.toUpperCase()),qn(r.available_qty),qn(r.reserved_qty),qn(r.total_qty)].join(',')+'\n';});
     var whF2=document.getElementById('replenWHFilter').value;
     var whCode2=whF2!=='all'?whF2:'ALL';
-    dl(out,'Replenishment_'+whCode2+'.csv');
+    var catPart2=activeCatFilter&&activeCatFilter!=='all'?'_'+activeCatFilter.replace(/[^a-zA-Z0-9]/g,''):'';
+    dl(out,'Replenishment_'+whCode2+catPart2+'.csv');
   }
 }
 function downloadBulkTemplate(){dl('sku,qty,batch_number,from_location,to_location\n','bulk_template.csv');}
@@ -1713,7 +1742,7 @@ function _doEmptyProcess(data,code,btn){
       // Validate: selected warehouse must exist in the uploaded file
       if(fileWHCodes.size>0&&!fileWHCodes.has(code)){
         var found=Array.from(fileWHCodes).sort().join(', ');
-        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br><strong>Warehouses found in file:</strong> '+found+' <br>Please select the correct warehouse or upload the matching file.');
+        showAlert('emptyAlert','⚠ The selected warehouse (<strong>'+code+'</strong>) was not found in the uploaded file.<br>Warehouses found in file: <strong>'+found+'</strong><br>Please select the correct warehouse or upload the matching file.');
         btn.innerHTML='▶ Process';btn.disabled=false;parseProgressError();return;
       }
       var locMap=getWHLocSet(code);
@@ -2137,8 +2166,8 @@ var GH_FILES={
 // Admin: fill in your GitHub username and repo name here.
 // Users do NOT need to configure anything — they pull automatically.
 // The token is only needed for PUSHING (admin only, entered in the UI).
-var GH_PUBLIC_USER  = '';   // e.g. 'eyewa-admin'
-var GH_PUBLIC_REPO  = '';   // e.g. 'eyewa-warehouse-tool'
+var GH_PUBLIC_USER  = 'mudasshar';   // e.g. 'eyewa-admin'
+var GH_PUBLIC_REPO  = 'eyewa-warehouse-tool';   // e.g. 'eyewa-warehouse-tool'
 var GH_PUBLIC_BRANCH= 'main';
 
 function getGHConfig(){try{var s=localStorage.getItem(LS_GH);return s?JSON.parse(s):{};}catch(e){return{};}}
@@ -2197,7 +2226,7 @@ function loadGHTab(){
   document.getElementById('ghBranch').value=c.branch||'main';
   document.getElementById('ghToken').value=cfg.token||'';
   // Show note if using hardcoded values
-  var usingHardcoded=(window._GH_USER&&window._GH_USER!=='FILL_YOUR_USERNAME');
+  var usingHardcoded=(window._GH_USER&&window._GH_USER!=='');
   var note=document.getElementById('ghHardcodedNote');
   if(note)note.style.display=usingHardcoded?'block':'none';
   ghSetAutoToggle(true);
@@ -2261,7 +2290,7 @@ function ghUpdateStatusBar(){
   bar.style.background='rgba(88,166,255,0.08)';
   bar.style.border='1px solid rgba(88,166,255,0.2)';
   bar.style.color='#58a6ff';
-  var src=(window._GH_USER&&window._GH_USER!=='FILL_YOUR_USERNAME')?' <span style="font-size:10px;opacity:0.7">(hardcoded in HTML)</span>':'';
+  var src=(window._GH_USER&&window._GH_USER!=='')?' <span style="font-size:10px;opacity:0.7">(hardcoded in HTML)</span>':'';
   bar.innerHTML='🐙 Connected to: <strong style="margin:0 4px">'+c.user+'/'+c.repo+'</strong> · branch: '+c.branch+src;
 }
 
