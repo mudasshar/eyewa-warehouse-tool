@@ -315,7 +315,7 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
 .hkut strong{display:block;font-size:13px;color:var(--text)}
 
 /* ── HK FILTER ── */
-.hkf{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.hkf{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;overflow:visible;position:relative;z-index:10;}
 .hkft{font-size:11px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
 .hkfg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
 @media(max-width:900px){.hkfg{grid-template-columns:repeat(2,1fr)}}
@@ -327,25 +327,48 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
 .hkfh select option{background:#0f172a}
 
 /* ── HK STAT TILES ── */
-.hksts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.hkst{border-radius:12px;padding:14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);text-align:center;cursor:pointer;transition:all 0.2s}
-.hkst:hover{border-color:rgba(255,255,255,0.15)}
-.hkst.active-tile{border-color:var(--eyewa);background:var(--eyewa-glow)}
-.hkst.st{border-color:rgba(42,181,165,0.2)}
-.hkst.se{border-color:rgba(239,68,68,0.2)}
-.hkst.sn{border-color:rgba(245,158,11,0.2)}
-.hkst.sv{border-color:rgba(168,85,247,0.2)}
-.hkst.st.active-tile{border-color:var(--eyewa);background:var(--eyewa-glow)}
-.hkst.se.active-tile{border-color:var(--danger);background:rgba(239,68,68,0.1)}
-.hkst.sn.active-tile{border-color:var(--warn);background:rgba(245,158,11,0.08)}
-.hkst.sv.active-tile{border-color:var(--purple);background:rgba(168,85,247,0.1)}
-.hksn{font-size:26px;font-weight:700;font-family:var(--mono)}
+.hksts{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:14px;
+  /* Ensure tiles never overlap zone dropdown */
+  position:relative;
+  z-index:0;
+}
+.hkst{
+  border-radius:12px;
+  padding:16px 12px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:90px;
+}
+.hkst:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06)}
+.hkst.st{border-color:rgba(42,181,165,0.25)}
+.hkst.se{border-color:rgba(239,68,68,0.25)}
+.hkst.sn{border-color:rgba(245,158,11,0.25)}
+.hkst.sv{border-color:rgba(168,85,247,0.25)}
+.hkst.active-tile.st{border-color:var(--eyewa);background:var(--eyewa-glow)}
+.hkst.active-tile.se{border-color:var(--danger);background:rgba(239,68,68,0.1)}
+.hkst.active-tile.sn{border-color:var(--warn);background:rgba(245,158,11,0.08)}
+.hkst.active-tile.sv{border-color:var(--purple);background:rgba(168,85,247,0.1)}
+.hksn{
+  font-size:28px;font-weight:700;font-family:var(--mono);
+  line-height:1;margin-bottom:6px;
+}
 .hkst.st .hksn{color:var(--eyewa)}
 .hkst.se .hksn{color:var(--danger)}
 .hkst.sn .hksn{color:var(--warn)}
 .hkst.sv .hksn{color:var(--purple)}
-.hksl{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
-.hksl2{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px;min-height:14px}
+.hksl{font-size:10px;color:var(--muted2);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.6px}
+.hksl2{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px;min-height:14px}
 
 /* ── HK SUBTABS ── */
 .hkstabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
@@ -379,10 +402,11 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
 .zcc{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:7px;max-height:190px;overflow-y:auto}
 .zcc::-webkit-scrollbar{width:4px}
 .zcc::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:999px}
-.zcb{display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:5px;font-size:11px;font-family:var(--mono);cursor:pointer;transition:background 0.12s;color:var(--muted2)}
-.zcb:hover{background:rgba(255,255,255,0.06);color:var(--text)}
-.zcb input[type=checkbox]{width:12px;height:12px;accent-color:var(--eyewa);cursor:pointer;flex-shrink:0}
-.zcb.sel{background:var(--eyewa-glow);color:var(--eyewa)}
+.zchip{display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:5px;font-size:11px;font-family:var(--mono);cursor:pointer;transition:background 0.12s;color:var(--muted2);user-select:none}
+.zchip:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.zchk{font-size:10px;color:var(--eyewa);opacity:0;width:12px;flex-shrink:0;transition:opacity 0.1s}
+.zchip.on{background:var(--eyewa-glow);color:var(--eyewa);border:1px solid rgba(42,181,165,0.3)}
+.zchip.on .zchk{opacity:1}
 .zfoot{display:flex;align-items:center;justify-content:space-between;padding:5px 9px;border-top:1px solid var(--border);background:rgba(255,255,255,0.02);font-size:10px;font-family:var(--mono);color:var(--muted)}
 .zfcnt{font-weight:600;color:var(--eyewa)}
 
@@ -1418,7 +1442,32 @@ function onSharedFileChange2(input){
 // ── FILE CHANGE (individual zones — also set sharedData) ──
 function onRFChange(input){if(input.files[0]){var f=input.files[0];var z=document.getElementById('replenDZ');z.classList.add('ok');document.getElementById('replenDZtxt').textContent=f.name;sharedFileName=f.name;readFile(f).then(function(d){sharedData=d;_syncSharedBadges('✓ '+f.name+' · '+d.length.toLocaleString()+' rows','var(--good)');showAlert('replenAlert','');}).catch(function(){});}}
 function onEFChange(input){if(input.files[0]){var f=input.files[0];var z=document.getElementById('emptyDZ');z.classList.add('ok');document.getElementById('emptyDZtxt').textContent=f.name;sharedFileName=f.name;readFile(f).then(function(d){sharedData=d;_syncSharedBadges('✓ '+f.name+' · '+d.length.toLocaleString()+' rows','var(--good)');showAlert('emptyAlert','');}).catch(function(){});}}
-function onHKFChange(input){if(input.files[0]){var f=input.files[0];var z=document.getElementById('hkDZ');z.classList.add('ok');document.getElementById('hkFileName').textContent=f.name;document.getElementById('hkProcessBtn').disabled=false;sharedFileName=f.name;readFile(f).then(function(d){sharedData=d;_syncSharedBadges('✓ '+f.name+' · '+d.length.toLocaleString()+' rows','var(--good)');showAlert('hkAlert','');}).catch(function(){});}}
+function onHKFChange(input){
+  if(input.files[0]){
+    var f=input.files[0];
+    // Clear all previous HK results before loading new file
+    hkRawData=[];hkAllData=[];hkFiltered=[];hkActiveTab='all';
+    selectedZones=new Set();allZones=[];lastZoneClick=-1;
+    document.getElementById('hkStats').style.display='none';
+    document.getElementById('hkSubtabs').style.display='none';
+    if(document.getElementById('hkSW'))document.getElementById('hkSW').style.display='none';
+    document.getElementById('hkDownBtn').disabled=true;
+    document.getElementById('hkTotal').textContent='0';
+    document.getElementById('hkExpCnt').textContent='0';
+    document.getElementById('hkNearCnt').textContent='0';
+    document.getElementById('hkInvCnt').textContent='0';
+    var tbody=document.getElementById('hkTBody');if(tbody)tbody.innerHTML='';
+    showAlert('hkAlert','');
+    var z=document.getElementById('hkDZ');z.classList.add('ok');
+    document.getElementById('hkFileName').textContent=f.name;
+    document.getElementById('hkProcessBtn').disabled=false;
+    sharedFileName=f.name;
+    readFile(f).then(function(d){
+      sharedData=d;
+      _syncSharedBadges('✓ '+f.name+' · '+d.length.toLocaleString()+' rows','var(--good)');
+    }).catch(function(){});
+  }
+}
 
 function processFile(){
   // Use shared data if available, otherwise fall back to file input
@@ -1922,7 +1971,8 @@ function applyHkFilters(){
   hkAllData=[];
   hkRawData.forEach(function(r){
     var zone=(r.loc||'').split('-')[0];
-    if(selectedZones.size>0&&!selectedZones.has(zone))return;
+    // If no zones selected → skip all; if zones selected → skip non-matching
+    if(!selectedZones.has(zone))return;
     if(ltf==='bulk'&&!r.locType.includes('bulk'))return;
     if(ltf==='pick'&&!r.locType.includes('pick'))return;
     if(whf!=='all'&&r.wh!==whf)return;
