@@ -326,55 +326,13 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
 .hkfh select:focus,.hkfh input:focus{border-color:var(--eyewa)}
 .hkfh select option{background:#0f172a}
 
-/* ── HK STAT TILES ── */
-.hksts{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:14px;
-  /* Ensure tiles never overlap zone dropdown */
-  position:relative;
-  z-index:0;
-}
-.hkst{
-  border-radius:12px;
-  padding:16px 12px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid var(--border);
-  text-align:center;
-  cursor:pointer;
-  transition:all 0.2s;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  min-height:90px;
-}
+
 .hkst:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06)}
-.hkst.st{border-color:rgba(42,181,165,0.25)}
+
 .hkst.se{border-color:rgba(239,68,68,0.25)}
 .hkst.sn{border-color:rgba(245,158,11,0.25)}
 .hkst.sv{border-color:rgba(168,85,247,0.25)}
-.hkst.active-tile.st{border-color:var(--eyewa);background:var(--eyewa-glow)}
-.hkst.active-tile.se{border-color:var(--danger);background:rgba(239,68,68,0.1)}
-.hkst.active-tile.sn{border-color:var(--warn);background:rgba(245,158,11,0.08)}
-.hkst.active-tile.sv{border-color:var(--purple);background:rgba(168,85,247,0.1)}
-.hksn{
-  font-size:28px;font-weight:700;font-family:var(--mono);
-  line-height:1;margin-bottom:6px;
-}
-.hkst.st .hksn{color:var(--eyewa)}
-.hkst.se .hksn{color:var(--danger)}
-.hkst.sn .hksn{color:var(--warn)}
-.hkst.sv .hksn{color:var(--purple)}
-.hksl{font-size:10px;color:var(--muted2);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.6px}
-.hksl2{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px;min-height:14px}
 
-/* ── HK SUBTABS ── */
-.hkstabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.hkstab{padding:6px 14px;border-radius:6px;font-size:12px;font-family:var(--mono);font-weight:600;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted2);cursor:pointer;margin:0;transition:all 0.15s}
-.hkstab:hover{background:rgba(255,255,255,0.08);color:var(--text)}
-.hkstab.ta{background:var(--eyewa-glow);border-color:rgba(42,181,165,0.4);color:var(--eyewa)}
 
 /* ── HK TABLE ── */
 .hktw{overflow:auto;border-radius:10px;border:1px solid var(--border);max-height:500px}
@@ -670,18 +628,8 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
       </div>
     </div>
     <div id="hkAlert"></div>
-    <div class="hksts" id="hkStats" style="display:none">
-      <div class="hkst st" onclick="if(hkAllData.length)switchHkTab('all')" style="cursor:pointer" title="Show all flagged"><div class="hksn" id="hkTotal">0</div><div class="hksl">Total Flagged</div><div class="hksl2"></div></div>
-      <div class="hkst se" onclick="if(hkAllData.length)switchHkTab('expired')" style="cursor:pointer" title="Show expired"><div class="hksn" id="hkExpCnt">0</div><div class="hksl">Expired</div><div class="hksl2"></div></div>
-      <div class="hkst sn" onclick="if(hkAllData.length)switchHkTab('near')" style="cursor:pointer" title="Show near expiry"><div class="hksn" id="hkNearCnt">0</div><div class="hksl">Near Expiry</div><div class="hksl2"></div></div>
-      <div class="hkst sv" onclick="if(hkAllData.length)switchHkTab('invalid')" style="cursor:pointer" title="Show invalid batches"><div class="hksn" id="hkInvCnt">0</div><div class="hksl">Invalid Batch</div><div class="hksl2" id="hkInvBreak"></div></div>
-    </div>
-    <div class="hkstabs" id="hkSubtabs" style="display:none">
-      <button class="hkstab ta" id="hkTabAll"  onclick="switchHkTab('all')">All</button>
-      <button class="hkstab"   id="hkTabExp"  onclick="switchHkTab('expired')">🔴 Expired</button>
-      <button class="hkstab"   id="hkTabNear" onclick="switchHkTab('near')">🟡 Near Expiry</button>
-      <button class="hkstab"   id="hkTabInv"  onclick="switchHkTab('invalid')">🟣 Invalid Batch</button>
-    </div>
+
+
     <div class="sw" id="hkSW" style="display:none;margin-bottom:10px">
       <span class="si">🔍</span>
       <input type="text" id="hkSearch" class="sinp" placeholder="Search Item ID, SKU, Batch, Location, Warehouse…" oninput="renderHkTable(this.value)"/>
@@ -1449,14 +1397,10 @@ function onHKFChange(input){
     // Clear all previous HK results before loading new file
     hkRawData=[];hkAllData=[];hkFiltered=[];hkActiveTab='all';
     selectedZones=new Set();allZones=[];lastZoneClick=-1;
-    document.getElementById('hkStats').style.display='none';
-    document.getElementById('hkSubtabs').style.display='none';
+
     if(document.getElementById('hkSW'))document.getElementById('hkSW').style.display='none';
     document.getElementById('hkDownBtn').disabled=true;
-    document.getElementById('hkTotal').textContent='0';
-    document.getElementById('hkExpCnt').textContent='0';
-    document.getElementById('hkNearCnt').textContent='0';
-    document.getElementById('hkInvCnt').textContent='0';
+
     var tbody=document.getElementById('hkTBody');if(tbody)tbody.innerHTML='';
     showAlert('hkAlert','');
     var z=document.getElementById('hkDZ');z.classList.add('ok');
@@ -1950,9 +1894,9 @@ function _doHKProcess(data,btn){
       var zs=new Set();hkRawData.forEach(function(r){var z=(r.loc||'').split('-')[0];if(z)zs.add(z);});
       allZones=Array.from(zs).sort();selectedZones=new Set(allZones);lastZoneClick=-1;buildZoneGrid();
       var now=new Date();document.getElementById('hkToday').textContent=now.getFullYear()+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+now.getDate().toString().padStart(2,'0');
-      document.getElementById('hkStats').style.display='grid';
+
       applyHkFilters();
-      document.getElementById('hkSubtabs').style.display='flex';document.getElementById('hkSW').style.display='block';document.getElementById('hkDownBtn').disabled=false;
+      document.getElementById('hkSW').style.display='block';document.getElementById('hkDownBtn').disabled=false;
       parseProgressDone();
       btn.innerHTML='▶ Process';btn.disabled=false;
     },0);
@@ -1986,11 +1930,10 @@ function applyHkFilters(){
   var inv=hkAllData.filter(function(r){return r.status==='invalid';}).length;
   var dum=hkAllData.filter(function(r){return r.status==='dummy';}).length;
   var total=hkAllData.length;
-  document.getElementById('hkTotal').textContent=total;
-  document.getElementById('hkExpCnt').textContent=exp;
-  document.getElementById('hkNearCnt').textContent=near;
+
+
+
   var invTotal=inv+dum;
-  document.getElementById('hkInvCnt').textContent=invTotal;
   
 // Update tile border to show active/inactive state
   var siTile=document.getElementById('hkInvCnt').closest?document.getElementById('hkInvCnt').closest('.hkst'):document.getElementById('hkInvCnt').parentNode;
@@ -2003,12 +1946,7 @@ function applyHkFilters(){
     else brk.textContent='none found';
   }
   hkActiveTab='all';hkSortCol=null;hkSortDir=1;updateHkSubtabs();applyHkTab();renderZoneBreakdown();updateZoneTrigLabel();
-}
-function switchHkTab(tab){hkActiveTab=tab;updateHkSubtabs();document.getElementById('hkSearch').value='';document.getElementById('hkSClr').style.display='none';applyHkTab();}
-function updateHkSubtabs(){
-  var map={all:{id:'hkTabAll',cls:'ta'},expired:{id:'hkTabExp',cls:'te'},near:{id:'hkTabNear',cls:'tn'},invalid:{id:'hkTabInv',cls:'ti'}};
-  Object.keys(map).forEach(function(k){var el=document.getElementById(map[k].id);if(el)el.className='hkstab'+(k===hkActiveTab?' '+map[k].cls:'');});
-}
+
 function applyHkTab(){
   if(hkActiveTab==='all'){
     hkFiltered=hkAllData.slice();
