@@ -700,7 +700,10 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
         <tbody id="hkBody"><tr><td colspan="12"><div class="es"><div class="es-i">🧹</div>Upload a file and press Process</div></td></tr></tbody>
       </table>
     </div>
-
+      <div class="zbd" id="zoneBreakdown" style="display:none">
+      <div class="zbdt">📍 Flagged Items by Zone</div>
+      <div class="zbdg" id="zoneBDGrid"></div>
+    </div>
 
   </div>
   <div class="hkft2">
@@ -2120,7 +2123,7 @@ document.addEventListener('click',function(e){
   }
 });
 function renderZoneBreakdown(){
-
+  var bd=document.getElementById('zoneBreakdown'),grid=document.getElementById('zoneBDGrid');
   if(!hkAllData.length){bd.style.display='none';return;}
   var zones={};hkAllData.forEach(function(r){var z=(r.loc||'').split('-')[0];if(!z)return;if(!zones[z])zones[z]={exp:0,near:0,inv:0};zones[z][r.status==='expired'?'exp':r.status==='near'?'near':'inv']++;});
   grid.innerHTML=Object.entries(zones).sort(function(a,b){return(b[1].exp+b[1].near+b[1].inv)-(a[1].exp+a[1].near+a[1].inv);}).map(function(e){var z=e[0],c=e[1];return '<div class="zbdi"><div class="zbdz">'+z+'</div><div class="zbdc">'+(c.exp?'<span class="ze">'+c.exp+' exp</span> ':'')+(c.near?'<span class="zn">'+c.near+' near</span> ':'')+(c.inv?'<span class="zi">'+c.inv+' inv</span>':'')+'</div></div>';}).join('');
