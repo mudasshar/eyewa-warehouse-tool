@@ -424,6 +424,196 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
 #ghSyncProgress{margin-top:10px}
 #ghSyncBar{height:3px;border-radius:999px;background:linear-gradient(90deg,var(--eyewa),var(--primary));transition:width 0.4s ease}
 #ghSyncLabel{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:5px}
+
+/* ══════════════════════════════════════════════════════
+   LIGHT MODE — applies when body.light is set
+   ══════════════════════════════════════════════════════ */
+body.light{
+  --bg1:#f0f4f8;
+  --bg2:#e2e8f0;
+  --card:rgba(255,255,255,0.85);
+  --card-hover:rgba(255,255,255,0.95);
+  --border:rgba(0,0,0,0.1);
+  --border-bright:rgba(59,130,246,0.5);
+  --text:#1e293b;
+  --muted:#64748b;
+  --muted2:#475569;
+  --primary:#2563eb;
+  --primary2:#1d4ed8;
+  --primary-glow:rgba(37,99,235,0.12);
+  --good:#059669;
+  --good-glow:rgba(5,150,105,0.1);
+  --warn:#d97706;
+  --danger:#dc2626;
+  --eyewa:#0e9488;
+  --eyewa-dark:#0d8277;
+  --eyewa-glow:rgba(14,148,136,0.12);
+  color:var(--text);
+  background:var(--bg1);
+}
+body.light::before{
+  background-image:
+    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(59,130,246,0.04) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+
+/* Header */
+body.light .header{
+  background:rgba(255,255,255,0.92);
+  border-bottom-color:var(--border);
+}
+
+/* Cards */
+body.light .card{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.08);
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+body.light .card:hover{border-color:rgba(0,0,0,0.14)}
+
+/* Upload zone */
+body.light .uz{background:rgba(0,0,0,0.02);border-color:rgba(0,0,0,0.12)}
+body.light .uz:hover{background:var(--eyewa-glow);border-color:var(--eyewa)}
+body.light .uz.ok{background:var(--good-glow);border-color:var(--good)}
+
+/* Buttons */
+body.light .btn-d{background:rgba(0,0,0,0.05);color:var(--muted2);border-color:var(--border)}
+body.light .btn-d:hover{background:rgba(0,0,0,0.09);color:var(--text)}
+body.light .ttgl{background:rgba(0,0,0,0.05);border-color:var(--border);color:var(--muted2)}
+body.light .ttgl:hover{background:rgba(0,0,0,0.09);color:var(--text)}
+
+/* Table */
+body.light th{background:#f8fafc;color:var(--muted2);border-bottom-color:var(--border)}
+body.light td{color:var(--muted2);border-bottom-color:rgba(0,0,0,0.05)}
+body.light tbody tr:hover td{background:rgba(59,130,246,0.05);color:var(--text)}
+body.light .tw{border-color:var(--border)}
+
+/* Summary bar */
+body.light .sbar{background:rgba(5,150,105,0.06);border-color:rgba(5,150,105,0.2)}
+
+/* Summary card */
+body.light .sumc{background:#ffffff;border-color:var(--border)}
+body.light .sti{background:rgba(0,0,0,0.03);border-color:var(--border)}
+
+/* Settings / filter panels */
+body.light .sp{background:rgba(0,0,0,0.03);border-color:var(--border)}
+body.light .fl input, body.light .fl select{background:#ffffff;border-color:var(--border);color:var(--text)}
+body.light .fl input:focus, body.light .fl select:focus{border-color:var(--eyewa)}
+
+/* Mode selector */
+body.light .mbtn{background:rgba(0,0,0,0.04);border-color:var(--border);color:var(--muted2)}
+body.light .mbtn:hover{background:rgba(0,0,0,0.08);color:var(--text)}
+body.light .thr-row{background:rgba(0,0,0,0.03);border-color:var(--border);color:var(--muted2)}
+body.light .thr-row input{background:#ffffff;border-color:var(--border);color:var(--text)}
+
+/* Cat filter */
+body.light .cfb{background:rgba(0,0,0,0.04);border-color:var(--border);color:var(--muted2)}
+body.light .cfb:hover{background:rgba(0,0,0,0.08);color:var(--text)}
+body.light .cfb.on{background:var(--eyewa-glow);border-color:rgba(14,148,136,0.4);color:var(--eyewa)}
+
+/* Search */
+body.light .sinp{background:#ffffff;border-color:var(--border);color:var(--text)}
+body.light .sinp:focus{border-color:var(--eyewa)}
+
+/* Admin overlay background */
+body.light .obg{background:rgba(15,23,42,0.4)}
+
+/* ── ADMIN PANEL LIGHT MODE ── */
+body.light .apnl{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.1);
+  box-shadow:0 24px 64px rgba(0,0,0,0.15);
+}
+body.light .apnl-h{
+  background:#f8fafc;
+  border-bottom-color:var(--border);
+}
+body.light .atabs{
+  background:#f1f5f9;
+  border-bottom-color:var(--border);
+}
+body.light .atab{color:var(--muted)}
+body.light .atab:hover{color:var(--muted2);background:rgba(0,0,0,0.04)}
+body.light .atab.on{color:var(--eyewa);border-bottom-color:var(--eyewa);background:#ffffff}
+body.light .abdy{background:#ffffff}
+body.light .ahint{background:rgba(0,0,0,0.03);border-color:var(--border)}
+body.light .ctbl th{background:#f8fafc;border-bottom-color:var(--border)}
+body.light .ctbl td{border-bottom-color:rgba(0,0,0,0.05)}
+body.light .ctbl input{background:#f8fafc;color:var(--text)}
+body.light .ctbl input:focus{background:#ffffff;border-color:var(--eyewa)}
+body.light .addb{background:rgba(0,0,0,0.03);border-color:var(--border);color:var(--muted2)}
+body.light .addb:hover{background:rgba(0,0,0,0.06);color:var(--text)}
+body.light .alf input,.body.light .alf input{background:#ffffff;border-color:var(--border);color:var(--text)}
+body.light .alf input:focus{border-color:var(--eyewa)}
+body.light .dfl select, body.light .dfl input{background:#ffffff;border-color:var(--border);color:var(--text)}
+body.light .aftr{background:#f8fafc;border-top-color:var(--border)}
+body.light .acls{background:rgba(0,0,0,0.05);border-color:var(--border);color:var(--muted2)}
+body.light .acls:hover{background:rgba(0,0,0,0.1);color:var(--text)}
+
+/* Admin gate */
+body.light .agate{background:#ffffff;border-color:var(--border)}
+body.light .agate input{background:#f8fafc;border-color:var(--border);color:var(--text)}
+body.light .agate input:focus{border-color:var(--eyewa);background:#ffffff}
+
+/* Modal */
+body.light .mbox{background:#ffffff;border-color:var(--border)}
+
+/* WH list */
+body.light .whi{background:rgba(0,0,0,0.02);border-color:var(--border)}
+body.light .whi:hover{border-color:rgba(0,0,0,0.14)}
+
+/* Tag input */
+body.light .tiw{background:#ffffff;border-color:var(--border)}
+
+/* HK page */
+body.light .hkuz{background:rgba(0,0,0,0.02);border-color:rgba(0,0,0,0.12)}
+body.light .hkuz:hover{background:var(--eyewa-glow);border-color:var(--eyewa)}
+body.light .hkuz.ok{background:var(--good-glow);border-color:var(--good)}
+body.light .hkf{background:rgba(0,0,0,0.02);border-color:var(--border)}
+body.light .hkfh select, body.light .hkfh input{background:#ffffff;border-color:var(--border);color:var(--text)}
+body.light .hkst{background:#ffffff;border-color:var(--border)}
+body.light .hkst:hover{background:#f8fafc}
+body.light .hkstab{background:rgba(0,0,0,0.04);border-color:var(--border);color:var(--muted2)}
+body.light .hkstab:hover{background:rgba(0,0,0,0.07);color:var(--text)}
+body.light .hkstab.ta{background:var(--eyewa-glow);border-color:rgba(14,148,136,0.4);color:var(--eyewa)}
+body.light .hktw{border-color:var(--border)}
+body.light .hkt th{background:#f8fafc;border-bottom-color:var(--border)}
+body.light .hkt td{border-bottom-color:rgba(0,0,0,0.05)}
+body.light .hkt tbody tr:hover td{background:rgba(168,85,247,0.04)}
+
+/* Zone dropdown */
+body.light .zst{background:#ffffff;border-color:var(--border);color:var(--text)}
+body.light .zst:hover{border-color:var(--eyewa)}
+body.light .zdd{background:#ffffff;border-color:rgba(0,0,0,0.12);box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+body.light .zsb{background:#f8fafc;border-bottom-color:var(--border);color:var(--text)}
+body.light .zab{background:#f8fafc;border-bottom-color:var(--border)}
+body.light .zac{background:rgba(0,0,0,0.04);border-color:var(--border);color:var(--muted2)}
+body.light .zac:hover{background:var(--eyewa-glow);color:var(--eyewa)}
+body.light .zchip{color:var(--muted2)}
+body.light .zchip:hover{background:rgba(0,0,0,0.06);color:var(--text)}
+body.light .zchip.on{background:var(--eyewa-glow);color:var(--eyewa);border-color:rgba(14,148,136,0.3)}
+body.light .zfoot{background:#f8fafc;border-top-color:var(--border)}
+
+/* Parse toast */
+body.light .parse-toast{background:#ffffff;border-color:var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.12)}
+body.light .parse-toast-lbl{color:var(--muted2)}
+
+/* GitHub sync tab */
+body.light #ghSyncProgress > div:first-child{background:rgba(0,0,0,0.06)}
+body.light .hbadge{background:var(--eyewa-glow);border-color:rgba(14,148,136,0.3)}
+
+/* Alert boxes */
+body.light .ae{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:#b91c1c}
+body.light .as{background:rgba(5,150,105,0.08);border-color:rgba(5,150,105,0.2);color:#065f46}
+body.light .aw{background:rgba(217,119,6,0.08);border-color:rgba(217,119,6,0.2);color:#92400e}
+
+/* Unknown section */
+body.light .unks{border-color:rgba(217,119,6,0.2)}
+body.light .unkh{background:rgba(217,119,6,0.05)}
+body.light .unktb th{background:rgba(217,119,6,0.04)}
+body.light .unktb td{border-bottom-color:rgba(0,0,0,0.05)}
+
 </style>
 </head>
 <body>
@@ -451,11 +641,10 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
         <input type="file" id="sharedFileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="onSharedFileChange(this)"/>
         <span>📂</span><span>Upload File</span>
       </label>
-      <button class="ttgl" id="tBtn1" onclick="toggleTheme()">🌙 Dark</button>
+      <a href="https://mudasshar.github.io/label-print/warehouse-label-tool.html" target="_blank" class="ttgl" style="text-decoration:none">🏷 Label Print</a>
+      <a href="https://mudasshar.github.io/WMS-Inventory-Mapper/" target="_blank" class="ttgl" style="text-decoration:none">🗺 Inventory Mapper</a>
       <button class="btn-pu" style="border-radius:999px;font-size:12px;padding:5px 14px" onclick="goTo('pageHK')">🧹 Housekeeping</button>
-      <a href="https://mudasshar.github.io/label-print/warehouse-label-tool.html">
-      <div class="hbadge">Label Printer</div>
-      </a>
+      <button class="ttgl" id="tBtn1" onclick="toggleTheme()" style="font-size:16px;padding:5px 8px" title="Toggle Light/Dark">🌙</button>
     </div>
   </div>
   <div class="container">
@@ -610,9 +799,10 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
         <input type="file" id="sharedFileInput2" accept=".csv,.xlsx,.xls" style="display:none" onchange="onSharedFileChange2(this)"/>
         <span>📂</span><span>Upload File</span>
       </label>
-      <button class="ttgl" id="tBtn2" onclick="toggleTheme()">🌙 Dark</button>
+      <a href="https://mudasshar.github.io/label-print/warehouse-label-tool.html" target="_blank" class="ttgl" style="text-decoration:none">🏷 Label Print</a>
+      <a href="https://mudasshar.github.io/WMS-Inventory-Mapper/" target="_blank" class="ttgl" style="text-decoration:none">🗺 Inventory Mapper</a>
       <button class="btn-d" style="border-radius:999px;font-size:12px;padding:5px 14px" onclick="goTo('pageReplen')">📦 Back to Replenishment</button>
-      <div class="hbadge" style="background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.25);color:var(--purple)">Eyewa Warehouse</div>
+      <button class="ttgl" id="tBtn2" onclick="toggleTheme()" style="font-size:16px;padding:5px 8px" title="Toggle Light/Dark">🌙</button>
     </div>
   </div>
   <div class="hkc">
@@ -702,10 +892,7 @@ tbody tr:hover td{background:rgba(59,130,246,0.06);color:var(--text)}
         <tbody id="hkBody"><tr><td colspan="12"><div class="es"><div class="es-i">🧹</div>Upload a file and press Process</div></td></tr></tbody>
       </table>
     </div>
-    <div class="zbd" id="zoneBreakdown" style="display:none">
-      <div class="zbdt">📍 Flagged Items by Zone</div>
-      <div class="zbdg" id="zoneBDGrid"></div>
-    </div>
+
   </div>
   <div class="hkft2">
     <span class="hkfn">Today: <strong id="hkToday">—</strong> · Sorted by urgency · Contact Lenses only</span>
@@ -1124,15 +1311,16 @@ function goTo(id){document.querySelectorAll('.page').forEach(function(p){p.class
 function toggleTheme(){
   var l=document.body.classList.toggle('light');
   localStorage.setItem('wh_theme',l?'light':'dark');
-  var lbl=l?'🌙 Dark':'☀ Light';
-  document.getElementById('tBtn1').textContent=lbl;
-  document.getElementById('tBtn2').textContent=lbl;
+  document.getElementById('tBtn1').textContent=l?'🌙':'☀';
+  document.getElementById('tBtn2').textContent=l?'🌙':'☀';
+  document.getElementById('tBtn1').title=l?'Switch to Dark':'Switch to Light';
+  document.getElementById('tBtn2').title=l?'Switch to Dark':'Switch to Light';
 }
 function initTheme(){
   if(localStorage.getItem('wh_theme')==='light'){
     document.body.classList.add('light');
-    document.getElementById('tBtn1').textContent='🌙 Dark';
-    document.getElementById('tBtn2').textContent='🌙 Dark';
+    document.getElementById('tBtn1').textContent='🌙';
+    document.getElementById('tBtn2').textContent='🌙';
   }
 }
 
@@ -2003,7 +2191,7 @@ function applyHkFilters(){
     else if(inv>0)brk.textContent=inv+' invalid';
     else brk.textContent='none found';
   }
-  hkActiveTab='all';hkSortCol=null;hkSortDir=1;updateHkSubtabs();applyHkTab();renderZoneBreakdown();updateZoneTrigLabel();
+  hkActiveTab='all';hkSortCol=null;hkSortDir=1;updateHkSubtabs();applyHkTab();updateZoneTrigLabel();
 }
 function switchHkTab(tab){hkActiveTab=tab;updateHkSubtabs();document.getElementById('hkSearch').value='';document.getElementById('hkSClr').style.display='none';applyHkTab();}
 function updateHkSubtabs(){
@@ -2123,14 +2311,6 @@ document.addEventListener('click',function(e){
     }
   }
 });
-function renderZoneBreakdown(){
-  var bd=document.getElementById('zoneBreakdown'),grid=document.getElementById('zoneBDGrid');
-  if(!hkAllData.length){bd.style.display='none';return;}
-  var zones={};hkAllData.forEach(function(r){var z=(r.loc||'').split('-')[0];if(!z)return;if(!zones[z])zones[z]={exp:0,near:0,inv:0};zones[z][r.status==='expired'?'exp':r.status==='near'?'near':'inv']++;});
-  grid.innerHTML=Object.entries(zones).sort(function(a,b){return(b[1].exp+b[1].near+b[1].inv)-(a[1].exp+a[1].near+a[1].inv);}).map(function(e){var z=e[0],c=e[1];return '<div class="zbdi"><div class="zbdz">'+z+'</div><div class="zbdc">'+(c.exp?'<span class="ze">'+c.exp+' exp</span> ':'')+(c.near?'<span class="zn">'+c.near+' near</span> ':'')+(c.inv?'<span class="zi">'+c.inv+' inv</span>':'')+'</div></div>';}).join('');
-  bd.style.display='block';
-}
-
 // ── TAG INPUT ──────────────────────────────────────────
 function loadTagState(){tagState.clKeywords=getCLKW();tagState.blacklist=getBL();}
 function renderTags(key,wrapId,isBL){
@@ -2304,8 +2484,8 @@ var GH_FILES={
 // Admin: fill in your GitHub username and repo name here.
 // Users do NOT need to configure anything — they pull automatically.
 // The token is only needed for PUSHING (admin only, entered in the UI).
-var GH_PUBLIC_USER  = 'mudasshar';   // e.g. 'eyewa-admin'
-var GH_PUBLIC_REPO  = 'eyewa-warehouse-tool';   // e.g. 'eyewa-warehouse-tool'
+var GH_PUBLIC_USER  = '';   // e.g. 'eyewa-admin'
+var GH_PUBLIC_REPO  = '';   // e.g. 'eyewa-warehouse-tool'
 var GH_PUBLIC_BRANCH= 'main';
 
 function getGHConfig(){try{var s=localStorage.getItem(LS_GH);return s?JSON.parse(s):{};}catch(e){return{};}}
