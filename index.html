@@ -1105,7 +1105,7 @@ body.light .sb-divider{background:rgba(0,0,0,0.08)}
       <button class="atab"    id="btnTD" onclick="switchTab('tabDef')">⚙ Defaults</button>
       <button class="atab"    id="btnTW" onclick="switchTab('tabWH')">📍 Location Mapping</button>
       <button class="atab"    id="btnTH" onclick="switchTab('tabHK')">🧹 Housekeeping</button>
-      <button class="atab"    id="btnTG" onclick="switchTab('tabGH')" style="color:#58a6ff">🐙 GitHub Sync</button>
+      <button class="atab"    id="btnTG" onclick="switchTab('tabGH')" style="color:#58a6ff"> 🔀 Sync Data</button>
     </div>
     <div class="abdy">
       <!-- CATEGORIES -->
@@ -2765,7 +2765,7 @@ function ghGateSubmit(){
 function loadGHTab(){
   document.getElementById('adminResetBtn').style.display='none';
   document.getElementById('adminSaveBtn').style.display='none';
-  document.getElementById('adminFooterNote').textContent='🐙 GitHub Sync — changes apply to all users';
+  document.getElementById('adminFooterNote').textContent='Sync — changes apply to all users';
   if(sessionStorage.getItem(LS_GH_GATE)==='1'){
     document.getElementById('ghGate').style.display='none';
     document.getElementById('ghContent').style.display='block';
